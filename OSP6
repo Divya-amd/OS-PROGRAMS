@@ -1,0 +1,54 @@
+#include <stdio.h>
+
+int main() {
+    int i, NOP, sum = 0, count = 0, y, quant, wt = 0, tat = 0, at[10], bt[10], temp[10];
+    float avg_wt, avg_tat;
+
+    // Input the number of processes
+    printf("Enter the total number of processes in the system: ");
+    scanf("%d", &NOP);
+
+    y = NOP;
+
+    // Input arrival time and burst time for each process
+    for(i = 0; i < NOP; i++) {
+        printf("\nEnter Arrival time and Burst time for Process[%d]: ", i + 1);
+        scanf("%d %d", &at[i], &bt[i]);
+        temp[i] = bt[i]; // Copy burst times to temp array for calculation
+    }
+
+    // Input the time quantum
+    printf("Enter the time quantum for the Round Robin scheduling: ");
+    scanf("%d", &quant);
+
+    // Round Robin Scheduling
+    printf("\nProcess No\tBurst Time\tWaiting Time\tTurnaround Time\n");
+
+    while (y > 0) {
+        for(i = 0; i < NOP; i++) {
+            if(temp[i] > 0) {
+                if(temp[i] > quant) {
+                    sum = sum + quant;
+                    temp[i] = temp[i] - quant;
+                } else {
+                    sum = sum + temp[i];
+                    temp[i] = 0;
+                    printf("Process[%d]\t\t%d\t\t%d\t\t\t%d\n", i + 1, bt[i], sum - at[i] - bt[i], sum - at[i]);
+                    wt = wt + sum - at[i] - bt[i];
+                    tat = tat + sum - at[i];
+                    y--; // Process is completed
+                }
+            }
+        }
+    }
+
+    // Calculate average waiting time and turnaround time
+    avg_wt = (float)wt / NOP;
+    avg_tat = (float)tat / NOP;
+
+    // Output the average waiting time and average turnaround time
+    printf("\nAverage Waiting Time: %f", avg_wt);
+    printf("\nAverage Turnaround Time: %f", avg_tat);
+
+    return 0;
+}
