@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+
+#define SHM_SIZE 1024 // Size of the shared memory segment
+
+int main() {
+    // Create or open a named memory-mapped file
+    HANDLE hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, // Use system paging file
+                                         NULL,                  // Default security
+                                         PAGE_READWRITE,        // Read/Write access
+                                         0,                      // Maximum object size (high-order DWORD)
+                                         SHM_SIZE,              // Maximum object size (low-order DWORD)
+                                         TEXT("SharedMemory")); // Name of the mapping object
+
+    if (hMapFile == NULL) {
+        printf("Could not create file mapping object (%d).\n", GetLastError());
+        return 1;
+    }
+
+    // Map the memory-mapped file into the process's address space
+    char *shm_ptr = (char*)MapViewOfFile(hMapFile,   // Handle to map object
+                                         FILE_MAP_ALL_ACCESS,  // Read/Write permission
+                                         0, 0,                 // File offset (high-order DWORD, low-order DWORD)
+                                         SHM_SIZE);            // Number of bytes to map
+
+    if (shm_ptr == NULL) {
+        printf("Could not map view of file (%d).\n", GetLastError());
+        CloseHandle(hMapFile); // Clean up before exit
+        return 1;
+    }
+
+    // Write data to the shared memory
+    strcpy(shm_ptr, "Hello, shared memory!");
+
+    // Output the data written to the shared memory
+    printf("Data written to shared memory: %s\n", shm_ptr);
+
+    // Unmap the shared memory segment
+    if (!UnmapViewOfFile(shm_ptr)) {
+        printf("Could not unmap view of file (%d).\n", GetLastError());
+    }
+
+    // Close the handle to the memory-mapped file
+    CloseHandle(hMapFile);
+
+    return 0;
+}
