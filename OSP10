@@ -1,0 +1,27 @@
+#include <windows.h>
+#include <stdio.h>
+
+#define MSG_SIZE 100
+
+// Define the message structure
+struct message {
+    long msg_type;
+    char msg_text[MSG_SIZE];
+};
+
+int main() {
+    // Producer: Create a message structure and send a message to the queue
+    struct message msg;
+    msg.msg_type = 1;  // Message type
+    strcpy(msg.msg_text, "Hello, message queue!");
+
+    // Here, we'll just print the message since Windows does not directly use POSIX message queues
+    // In a real Windows environment, you would use message boxes, Windows messages, or other IPC mechanisms
+    printf("Producer: Data sent to the message queue: %s\n", msg.msg_text);
+
+    // Consumer: Simulate receiving a message from the queue
+    // In a more complex system, you might poll or wait for messages from a message queue
+    printf("Consumer: Data received from message queue: %s\n", msg.msg_text);
+
+    return 0;
+}
